@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sergio Pulido </title>
+<style>
+:root {
+  --bg0: #030306;
+  --bg1: #050510;
+  --ink: #f8f8f8;
+  --muted: #a0a0a8;
+  --faint: #606068;
+  
+  --gold: #d4a574;
+  --gold2: #b8864f;
+  
+  --line: rgba(255,255,255,.08);
+  --glass: rgba(255,255,255,.03);
+  
+  --ease: cubic-bezier(.16,1,.3,1);
+  --fast: 280ms;
+  --mid: 540ms;
+  --slow: 900ms;
+  
+  --mono: ui-monospace, "SF Mono", Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--bg0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* FULL-PAGE STARFIELD CANVAS */
+#starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* GRADIENT OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(1200px 800px at 50% -10%, rgba(212,165,116,.12), transparent 65%),
+    radial-gradient(1000px 700px at 10% 40%, rgba(77,208,225,.08), transparent 60%),
+    radial-gradient(900px 600px at 95% 70%, rgba(180,134,79,.06), transparent 58%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wrap {
+  width: min(1280px, 92vw);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* HEADER */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.788);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mark {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  text-decoration: none;
+  transition: transform var(--fast) var(--ease);
+  color: #ffffff;
+}
+
+.mark:hover { transform: translateY(-1px); }
+
+.mark strong {
+  font-weight: 700;
+  letter-spacing: -.03em;
+  font-size: 17px;
+}
+
+.mark span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+nav {
+  display: flex;
+  gap: 4px;
+  font-size: 14px;
+}
+
+nav a {
+  padding: 10px 16px;
+  color: var(--muted);
+  text-decoration: none;
+  border-radius: 100px;
+  transition: all var(--fast) var(--ease);
+}
+
+nav a:hover {
+  color: var(--ink);
+  background: rgba(255,255,255,.06);
+}
+
+/* HERO */
+main { padding-top: 72px; position: relative; z-index: 2; }
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 0 80px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .20em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  animation: fadeUp 1s var(--ease) .1s forwards;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--gold));
+  box-shadow: 0 0 20px rgba(212,165,116,.4);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .7; transform: scale(1.15); }
+}
+
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(56px, 8vw, 110px);
+  font-weight: 600;
+  letter-spacing: -.05em;
+  line-height: .95;
+  margin: 24px 0 16px;
+  opacity: 0;
+  animation: fadeUp 1s var(--ease) .2s forwards;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.lead {
+  font-size: clamp(18px, 2.4vw, 22px);
+  color: var(--muted);
+  max-width: 62ch;
+  line-height: 1.65;
+  margin-bottom: 32px;
+  opacity: 0;
+  animation: fadeUp 1s var(--ease) .3s forwards;
+}
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.heroActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 1s var(--ease) .4s forwards;
+}
+
+.btn {
+  padding: 14px 28px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--line);
+  background: var(--glass);
+  color: var(--ink);
+  transition: all var(--mid) var(--ease);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(212,165,116,.15), transparent);
+  opacity: 0;
+  transition: opacity var(--mid) var(--ease);
+}
+
+.btn:hover::before { opacity: 1; }
+
+.btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(212,165,116,.3);
+  box-shadow: 0 16px 48px rgba(212,165,116,.15);
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-color: transparent;
+  color: #000;
+}
+
+.btn.primary:hover {
+  box-shadow: 0 20px 60px rgba(212,165,116,.35);
+}
+
+/* WORK SECTION */
+.work-section {
+  padding: 160px 0;
+}
+
+.section-header {
+  margin-bottom: 80px;
+}
+
+.kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .20em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 700;
+  letter-spacing: -.03em;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .projects-grid { grid-template-columns: 1fr; }
+}
+
+/* 3D FLIP CARD */
+.flip-card {
+  height: 520px;
+  perspective: 2000px;
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all var(--slow) var(--ease);
+}
+
+.flip-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform var(--slow) var(--ease);
+}
+
+.flip-card.flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-face.back {
+  transform: rotateY(180deg);
+  overflow-y: auto;
+}
+
+.card-tag {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 100px;
+  background: rgba(212,165,116,.12);
+  border: 1px solid rgba(212,165,116,.2);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  width: fit-content;
+}
+
+.card-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  margin-bottom: 12px;
+}
+
+.card-desc {
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  flex: 1;
+}
+
+.card-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(255,255,255,.02);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.04);
+}
+
+.stat {
+  flex: 1;
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.card-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.04);
+  color: var(--ink);
+  transition: all var(--fast) var(--ease);
+  cursor: pointer;
+}
+
+.card-btn:hover {
+  background: rgba(255,255,255,.08);
+  transform: translateY(-1px);
+}
+
+.card-btn.primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-color: transparent;
+  color: #000;
+}
+
+/* README */
+.readme h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  letter-spacing: -.02em;
+}
+
+.readme p {
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.readme ul {
+  list-style: none;
+  margin-bottom: 16px;
+}
+
+.readme li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.readme li b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* CONTACT */
+.contact-section {
+  padding: 120px 0;
+  border-top: 1px solid var(--line);
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+}
+
+@media (max-width: 768px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+.contact-info h2 {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+  margin-bottom: 16px;
+}
+
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--glass);
+  text-decoration: none;
+  color: var(--ink);
+  transition: all var(--fast) var(--ease);
+}
+
+.contact-link:hover {
+  background: rgba(255,255,255,.06);
+  transform: translateX(4px);
+}
+
+/* FOOTER */
+footer {
+  padding: 60px 0 40px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: var(--faint);
+}
+
+footer a {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color var(--fast) var(--ease);
+}
+
+footer a:hover { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- FULL-PAGE STARFIELD -->
+<canvas id="starfield"></canvas>
+
+<header>
+  <div class="wrap">
+    <div class="nav">
+      <a href="#" class="mark">
+        <strong>Sergio Pulido</strong>
+        <span>Systems</span>
+      </a>
+      <nav>
+        <a href="#work">Work</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">
+        <span class="status-dot"></span>
+        <span>Sergio Pulido Vazquez</span>
+      </div>
+      
+      <h1>
+        Product Designer.<br>
+        <span class="gradient-text">Engineering and Designing Intelligent Scalable Systems</span>
+      </h1>
+      
+      <p class="lead">
+        I build premium interfaces with surgical precision. Clean code, 
+        sophisticated motion, and systematic design thinking. 
+        No noise—just signal.
+      </p>
+      
+      <div class="heroActions">
+        <a href="#work" class="btn primary">View work</a>
+        <a href="#contact" class="btn">Get in touch</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="work-section" id="work">
+    <div class="wrap">
+      <div class="section-header">
+        <div class="kicker">Selected work</div>
+        <h2 class="section-title">Systems that scale.</h2>
+      </div>
+      
+      <div class="projects-grid">
+
+        <!-- FitFlow -->
+        <article class="flip-card">
+          <div class="flip-inner">
+            <div class="card-face front">
+              <span class="card-tag">FitFlow</span>
+              <h3 class="card-title">Fitness tracking system</h3>
+              <p class="card-desc">
+                Full-stack fitness application with real-time tracking, 
+                analytics dashboard, and progress visualization.
+              </p>
+              <div class="card-stats">
+                <div class="stat">
+                  <div class="stat-label">Stack</div>
+                  <div class="stat-value">React</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">Status</div>
+                  <div class="stat-value">Live</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">Year</div>
+                  <div class="stat-value">2025</div>
+                </div>
+              </div>
+              <div class="card-actions">
+                <a href="https://fitflow-v2.vercel.app" target="_blank" class="card-btn primary">View live</a>
+                <button class="card-btn" onclick="this.closest('.flip-card').classList.toggle('flipped')">Details</button>
+              </div>
+            </div>
+            <div class="card-face back">
+              <span class="card-tag">Technical</span>
+              <div class="readme">
+                <h3>FitFlow</h3>
+                <p>React 18 + Vite + Supabase. Magic-link auth, Zustand state persisted to localStorage. Vitest unit tests + Playwright E2E on Chromium and Mobile Safari.</p>
+                <ul>
+                  <li><b>Pages:</b> Landing, Login, Onboarding, Home, Dashboard, Weight, Calories, Settings</li>
+                  <li><b>Data:</b> Weight entries + calorie logs with Row Level Security</li>
+                  <li><b>Calories:</b> Draft-then-commit — nothing hits the DB until "Commit Day"</li>
+                  <li><b>Realtime:</b> Weight changes sync across tabs via Supabase subscription</li>
+                </ul>
+                <div class="card-actions">
+                  <a href="https://fitflow-v2.vercel.app" target="_blank" class="card-btn primary">View live</a>
+                  <button class="card-btn" onclick="this.closest('.flip-card').classList.toggle('flipped')">Back</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Locked In -->
+        <article class="flip-card">
+          <div class="flip-inner">
+            <div class="card-face front">
+              <span class="card-tag">Locked In</span>
+              <h3 class="card-title">Task accountability app</h3>
+              <p class="card-desc">
+                No exceptions. Task accountability with calendar tracking, 
+                focus mode, and tier-based scoring.
+              </p>
+              <div class="card-stats">
+                <div class="stat">
+                  <div class="stat-label">Stack</div>
+                  <div class="stat-value">React</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">Backend</div>
+                  <div class="stat-value">Supabase</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">Tests</div>
+                  <div class="stat-value">E2E</div>
+                </div>
+              </div>
+              <div class="card-actions">
+                <a href="https://lockedinv1.vercel.app/" target="_blank" class="card-btn primary">View live</a>
+                <button class="card-btn" onclick="this.closest('.flip-card').classList.toggle('flipped')">Details</button>
+              </div>
+            </div>
+            <div class="card-face back">
+              <span class="card-tag">Technical</span>
+              <div class="readme">
+                <h3>Locked In</h3>
+                <p>React + Vite + Tailwind. Supabase Postgres, Auth, Realtime. Zustand for UI state. React Hook Form + Zod validation. Vitest unit tests + Playwright E2E.</p>
+                <ul>
+                  <li><b>Pages:</b> Landing, Dashboard, Calendar, Login, SignUp</li>
+                  <li><b>Dashboard:</b> Kanban columns, TaskCard, FocusBanner, add/edit modals</li>
+                  <li><b>Calendar:</b> MonthlyRing, StatCards, DetailPanel per day</li>
+                  <li><b>Hooks:</b> useAuth, useTasks, useCompletions, useCalendar</li>
+                </ul>
+                <div class="card-actions">
+                  <a href="https://lockedinv1.vercel.app/" target="_blank" class="card-btn primary">View live</a>
+                  <button class="card-btn" onclick="this.closest('.flip-card').classList.toggle('flipped')">Back</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Grade Calc -->
+        <article class="flip-card">
+          <div class="flip-inner">
+            <div class="card-face front">
+              <span class="card-tag">Grade Calc</span>
+              <h3 class="card-title">Field calculator — web app</h3>
+              <p class="card-desc">
+                Professional pipe invert, slope verification, and structure 
+                calculations built for field use. Cloud-synced runs.
+              </p>
+              <div class="card-stats">
+                <div class="stat">
+                  <div class="stat-label">Stack</div>
+                  <div class="stat-value">Next.js</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">Backend</div>
+                  <div class="stat-value">Supabase</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">Deploy</div>
+                  <div class="stat-value">Vercel</div>
+                </div>
+              </div>
+              <div class="card-actions">
+                <a href="https://gradecalc-v3.vercel.app/" target="_blank" class="card-btn primary">View live</a>
+                <button class="card-btn" onclick="this.closest('.flip-card').classList.toggle('flipped')">Details</button>
+              </div>
+            </div>
+            <div class="card-face back">
+              <span class="card-tag">Technical</span>
+              <div class="readme">
+                <h3>Grade Calc</h3>
+                <p>Next.js 14 + Supabase. Email/password auth with Row Level Security. Dark mode only. All runs named and cloud-saved per user.</p>
+                <ul>
+                  <li><b>Section 1:</b> Height of Instrument (HI) from benchmark</li>
+                  <li><b>Section 2:</b> Hub to Start Invert with cut/fill mode</li>
+                  <li><b>Section 3:</b> Slope verification between two rod shots</li>
+                  <li><b>Section 4:</b> Structure calcs — pipe wall, basin floor, stone depth</li>
+                </ul>
+                <div class="card-actions">
+                  <a href="https://gradecalc-v3.vercel.app/" target="_blank" class="card-btn primary">View live</a>
+                  <button class="card-btn" onclick="this.closest('.flip-card').classList.toggle('flipped')">Back</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-section" id="contact">
+    <div class="wrap">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <div class="kicker">Contact</div>
+          <h2>Let's build something exceptional.</h2>
+          <p style="color: var(--muted); margin-top: 16px; line-height: 1.7;">
+            Email me what you're building. I reply with a plan and move fast.
+          </p>
+        </div>
+        <div class="contact-links">
+          <a href="mailto:spulidov1@gmail.com" class="contact-link">
+            <span>→</span>
+            <span>spulidov1@gmail.com</span>
+          </a>
+          <a href="https://github.com/spulidov1" target="_blank" class="contact-link">
+            <span>→</span>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap" style="display: flex; justify-content: space-between; width: 100%;">
+    <div>© 2025 Sergio Pulido • Futuristic Building</div>
+    <div style="display: flex; gap: 20px;">
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// FULL-PAGE 3D STARFIELD
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+resize();
+window.addEventListener('resize', resize);
+
+const particles = [];
+const particleCount = 100;
+
+class Star {
+  constructor() {
+    this.x = (Math.random() - 0.5) * 2000;
+    this.y = (Math.random() - 0.5) * 2000;
+    this.z = Math.random() * 1500;
+    this.vz = 0.8;
+  }
+  
+  update() {
+    this.z -= this.vz;
+    if (this.z <= 0) this.z = 1500;
+  }
+  
+  project() {
+    const scale = 600 / (600 + this.z);
+    return {
+      x: canvas.width / 2 + this.x * scale,
+      y: canvas.height / 2 + this.y * scale,
+      size: scale * 2.5,
+      opacity: Math.min((1500 - this.z) / 1500, 0.6)
+    };
+  }
+}
+
+for (let i = 0; i < particleCount; i++) {
+  particles.push(new Star());
+}
+
+function animate() {
+  ctx.fillStyle = 'rgba(3,3,6,0.08)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  particles.forEach(p => {
+    p.update();
+    const proj = p.project();
+    
+    if (proj.x > 0 && proj.x < canvas.width && proj.y > 0 && proj.y < canvas.height) {
+      ctx.fillStyle = `rgba(212,165,116,${proj.opacity})`;
+      ctx.beginPath();
+      ctx.arc(proj.x, proj.y, proj.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+  
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+// SCROLL-TRIGGERED REVEALS
+const cards = document.querySelectorAll('.flip-card');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, index) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.classList.add('visible');
+      }, index * 200);
+    }
+  });
+}, { threshold: 0.2 });
+
+cards.forEach(card => observer.observe(card));
+</script>
+
+</body>
+</html>
