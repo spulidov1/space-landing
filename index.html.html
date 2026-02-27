@@ -50,6 +50,7 @@ body {
   height: 100%;
   z-index: 0;
   pointer-events: none;
+  background: #030306;
 }
 
 /* GRADIENT OVERLAY */
@@ -59,7 +60,6 @@ body::before {
   inset: 0;
   background:
     radial-gradient(1200px 800px at 50% -10%, rgba(212,165,116,.12), transparent 65%),
-    radial-gradient(1000px 700px at 10% 40%, rgba(77,208,225,.08), transparent 60%),
     radial-gradient(900px 600px at 95% 70%, rgba(180,134,79,.06), transparent 58%);
   pointer-events: none;
   z-index: 1;
@@ -809,7 +809,9 @@ for (let i = 0; i < particleCount; i++) {
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = 'rgba(3,3,6,0.08)';
+  ctx.fillStyle = '#030306';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(3,3,6,0.12)';  // warm trail layer, slightly stronger than before
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   
   particles.forEach(p => {
